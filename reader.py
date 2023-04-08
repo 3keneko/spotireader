@@ -1,23 +1,38 @@
 import json
 
 
+FILES = ("StreamingHistory0.json", "StreamingHistory1.json")
+
 def ms_to_readable(time_string: str) -> str:
     time = int(time_string)
     hours, mins = divmod(time, int(3.6e6))
     mins, secs = divmod(mins, int(6e4))
-    secs %= int(e3)
+    secs //= int(1e3)
     return f"{hours}h {mins}m {secs}s"
 
 
-f = open('StreamingHistory0.json')
-history=json.loads(f.read())
-total = {}
+def compile_data_from_files(files: tuple[str]) -> dict[str, int]:
+    total = {}
+    for file in files:
+        with open(file) as contents:
+            history = json.load(contents)
+            for song in history:
+                if total.get(song["artistName"]):
+                    total[song["artistName"]] += int(song["msPlayed"])
+                else:
+                    total[song['artistName']] = int(song["msPlayed"])
+    return total
 
 
-for song in history:
-    if total.get(song["artistName"]):
-        total[song["artistName"]] += int(song["msPlayed"])
-    else:
-        total[song['artistName']] = int(song["msPlayed"])
+def main(t_number) -> None:
+    s = compile_data_from_files(FILES)
+    keyz = list(s)
+    keyz.sort(key=lambda x: s.get(x), reverse=True)
+    top = keyz[:t_number]
+    for rank, artist in enumerate(top, start=1):
+        print(f"at number {rank}, we have {artist} with a total of {ms_to_readable(s.get(artist))}")
 
-f.close()
+
+if __name__ == '__main__':
+    top_number = int(input("How many artists would you like to see? "))
+    main(top_number)
