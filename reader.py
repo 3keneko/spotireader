@@ -1,6 +1,6 @@
 import json
 
-
+# v sentez vous libre de modifier cette variable au gré de vos besoins
 FILES = ("StreamingHistory0.json", "StreamingHistory1.json")
 
 def ms_to_readable(time_string: str) -> str:
